@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class Home extends StatefulWidget {
-
   @override
   State<Home> createState() => _HomeState();
 }
+
 class _HomeState extends State<Home> {
   List<Map<String, String>> datas = [];
 
@@ -99,33 +99,12 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: GestureDetector(
-            onTap: () {
-              print('click');
-            },
-            child: Row(
-              children: [Text("xx동"), Icon(Icons.arrow_drop_down)],
-            ),
-          ),
-          elevation: 1,
-          actions: [
-            IconButton(onPressed: () {}, icon: Icon(Icons.search)),
-            IconButton(onPressed: () {}, icon: Icon(Icons.tune)),
-
-          ],
-        ),
-        body: _bodyWidget()
+      appBar: _appBarWidget(),
+      body: _bodyWidget(),
     );
   }
 
-
-  Widget _bodyWidget() {
-    return Container();
-  }
-
-
-  Widget _appbarWidget() {
+  PreferredSizeWidget _appBarWidget() {
     return AppBar(
       title: GestureDetector(
         onTap: () {
@@ -144,5 +123,58 @@ class _HomeState extends State<Home> {
             icon: SvgPicture.asset("assets/svg/bell.svg", width: 22)),
       ],
     );
+  }
+
+  Widget _bodyWidget() {
+    return ListView.separated(
+        itemBuilder: (context, index) {
+          return Container(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+              child: Row(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.all(Radius.circular(12)),
+                child: Image.asset(datas[index]['image']!,
+                    width: 100, height: 100),
+                /**
+                     *
+                        Image.asset(datas[index]["image"]
+                        여기서 The argument type 'String?' can't be assigned to the parameter type 'String'.오류
+                        해당 부분이 null이 올 수 있는 데이터이기 때문에 !를 넣어 강제추출을 해준다.
+                     **/
+              ),
+              Expanded(
+                child: Container(
+                  height: 100,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(datas[index]['title']!),
+                      Text(datas[index]['location']!),
+                      Text(datas[index]['price']!),
+                      Expanded(
+                        child: Container(
+                          child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                SvgPicture.asset("assets/svg/heart_off.svg",
+                                    width: 13, height: 13),
+                                SizedBox(width: 5),
+                                Text(datas[index]['likes']!)
+                              ]),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            ],
+          ));
+        }, //item Widget
+        separatorBuilder: (context, index) {
+          return Container(height: 1, color: Colors.black.withOpacity(0.4));
+        }, //item 사이에 있는 구분선
+        itemCount: 10);
   }
 }
