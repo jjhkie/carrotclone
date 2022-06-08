@@ -9,10 +9,12 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   List<Map<String, String>> datas = [];
+  var _currentPageIndex;
 
   @override
   void initState() {
     super.initState();
+    _currentPageIndex = 0;
     datas = [
       {
         "cid": "1",
@@ -102,6 +104,7 @@ class _HomeState extends State<Home> {
     return Scaffold(
       appBar: _appBarWidget(),
       body: _bodyWidget(),
+      bottomNavigationBar: _bottomNavigationBarWidget(),
     );
   }
 
@@ -125,62 +128,94 @@ class _HomeState extends State<Home> {
       ],
     );
   }
+  BottomNavigationBarItem _bottomNavigationBarItem(
+      String iconName, String label){
+    return BottomNavigationBarItem(icon: SvgPicture.asset("assets/svg/${iconName}_off.svg",width:22),
+    label: label);
+  }
 
-  final oCcy = new NumberFormat("#,###","ko_KR");
-  String calcStringToWon(String priceString){
 
+  Widget _bottomNavigationBarWidget() {
+    return BottomNavigationBar(
+      type: BottomNavigationBarType.fixed,
+      onTap: (int index){
+        setState((){
+          _currentPageIndex = index;
+        });
+      },
+        currentIndex: _currentPageIndex,
+        selectedItemColor: Colors.black,
+        items: [
+          _bottomNavigationBarItem("home","홈"),
+          _bottomNavigationBarItem("notes","동네생활"),
+          _bottomNavigationBarItem("location","내 근처"),
+          _bottomNavigationBarItem("chat","채팅"),
+          _bottomNavigationBarItem("user","나의 당근"),
+        ]
+    );
+  }
+
+
+  final oCcy = new NumberFormat("#,###", "ko_KR");
+
+  String calcStringToWon(String priceString) {
     return "${oCcy.format(int.parse(priceString))}원";
   }
 
   Widget _bodyWidget() {
     return ListView.separated(
-      padding: const EdgeInsets.symmetric(horizontal: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 10),
         itemBuilder: (context, index) {
           return Container(
-            padding: const EdgeInsets.symmetric(vertical: 10),
+              padding: const EdgeInsets.symmetric(vertical: 10),
               child: Row(
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.all(Radius.circular(12)),
-                child: Image.asset(datas[index]['image']!,
-                    width: 100, height: 100),
-                /**
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.all(Radius.circular(12)),
+                    child: Image.asset(datas[index]['image']!,
+                        width: 100, height: 100),
+                    /**
                      *
                         Image.asset(datas[index]["image"]
                         여기서 The argument type 'String?' can't be assigned to the parameter type 'String'.오류
                         해당 부분이 null이 올 수 있는 데이터이기 때문에 !를 넣어 강제추출을 해준다.
                      **/
-              ),
-              Expanded(
-                child: Container(
-                  height: 100,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(datas[index]['title']!,overflow:TextOverflow.ellipsis,style: TextStyle(fontSize: 15),),
-                      SizedBox(height:5),
-                      Text(datas[index]['location']!,style: TextStyle(fontSize:12, color: Colors.black.withOpacity(0.3)),),
-                      SizedBox(height:5),
-                      Text(calcStringToWon(datas[index]['price']!),style:TextStyle(fontWeight:FontWeight.w500 )),
-                      Expanded(
-                        child: Container(
-                          child: Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                SvgPicture.asset("assets/svg/heart_off.svg",
-                                    width: 13, height: 13),
-                                SizedBox(width: 5),
-                                Text(datas[index]['likes']!)
-                              ]),
-                        ),
-                      ),
-                    ],
                   ),
-                ),
-              )
-            ],
-          ));
+                  Expanded(
+                    child: Container(
+                      height: 100,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(datas[index]['title']!,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(fontSize: 15),),
+                          SizedBox(height: 5),
+                          Text(datas[index]['location']!,
+                            style: TextStyle(fontSize: 12, color: Colors.black
+                                .withOpacity(0.3)),),
+                          SizedBox(height: 5),
+                          Text(calcStringToWon(datas[index]['price']!),
+                              style: TextStyle(fontWeight: FontWeight.w500)),
+                          Expanded(
+                            child: Container(
+                              child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    SvgPicture.asset("assets/svg/heart_off.svg",
+                                        width: 13, height: 13),
+                                    SizedBox(width: 5),
+                                    Text(datas[index]['likes']!)
+                                  ]),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                ],
+              ));
         }, //item Widget
         separatorBuilder: (context, index) {
           return Container(height: 1, color: Colors.black.withOpacity(0.4));
